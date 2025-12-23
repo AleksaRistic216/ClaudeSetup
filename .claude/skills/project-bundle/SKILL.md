@@ -53,8 +53,15 @@ src/{ProjectName}/
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="LSCore.Contracts" Version="9.1.2" />
-    <PackageReference Include="LSCore.Auth.UserPass.Contracts" Version="9.1.2" />
+      <PackageReference Include="LSCore.Auth.UserPass.Contracts" Version="9.1.3" />
+      <PackageReference Include="LSCore.Common.Contracts" Version="9.1.3" />
+      <PackageReference Include="LSCore.Common.Extensions" Version="9.1.3" />
+      <PackageReference Include="LSCore.Mapper.Contracts" Version="9.1.3" />
+      <PackageReference Include="LSCore.Repository.Contracts" Version="9.1.3" />
+      <PackageReference Include="LSCore.SortAndPage.Contracts" Version="9.1.3" />
+      <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.3.0" />
+      <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+      <PackageReference Include="ValueInjecter" Version="3.2.0" />
   </ItemGroup>
 </Project>
 ```
@@ -216,6 +223,7 @@ public static class ServicesExtensions
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.Extensions.Configuration" />
     <PackageReference Include="LSCore.Validation" Version="9.1.2" />
   </ItemGroup>
   <ItemGroup>
@@ -238,7 +246,7 @@ public static class ServicesExtensions
 
 **File: `{ProjectName}.Common.DbMigrations.csproj`**
 ```xml
-<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net9.0</TargetFramework>
@@ -270,24 +278,17 @@ public static class ServicesExtensions
 
 **Sample Program.cs for Migrations:**
 ```csharp
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using {ProjectName}.Common.Repository;
 
-var builder = new ConfigurationBuilder()
-    .SetBasePath(Directory.GetCurrentDirectory())
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
+var builder = WebApplication.CreateBuilder(args);
+builder
+    .Configuration.AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
 
-var configuration = builder.Build();
-
-var optionsBuilder = new DbContextOptionsBuilder<{ProjectName}DbContext>();
-optionsBuilder.UseNpgsql(
-    DbConstants.ConnectionString(configuration),
-    x => x.MigrationsAssembly("{ProjectName}.Common.DbMigrations")
-        .MigrationsHistoryTable("migrations_history")
-);
-
-using var context = new {ProjectName}DbContext(optionsBuilder.Options, configuration);
+builder.Services.AddSingleton<IConfigurationRoot>(builder.Configuration);
+builder.Services.RegisterDatabase();
+var app = builder.Build();
+app.Run();
 ```
 
 ### 1.6 Public.Api Project
@@ -525,8 +526,10 @@ public class UsersCreateRequest
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="LSCore.Auth.Key.Contracts" Version="9.1.4.1" />
-    <PackageReference Include="LSCore.Validation" Version="9.1.2" />
+      <PackageReference Include="LSCore.Auth.UserPass.Domain" Version="9.1.3" />
+      <PackageReference Include="LSCore.Mapper.Domain" Version="9.1.3" />
+      <PackageReference Include="LSCore.SortAndPage.Domain" Version="9.1.3" />
+      <PackageReference Include="LSCore.Validation.Domain" Version="9.1.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\{ProjectName}.Common\{ProjectName}.Common.Domain\{ProjectName}.Common.Domain.csproj" />
