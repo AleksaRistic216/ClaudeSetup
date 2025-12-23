@@ -15,20 +15,13 @@ When the user asks to commit changes with a short message:
 1. **Review Changes**: Run `git status` and `git diff` in parallel to see what changes exist
 2. **Review Commit History**: Run `git log -5 --oneline` to see recent commit message style
 3. **Draft Message**: Create a concise commit message that:
-   - Is 50 characters or less
-   - Uses present tense ("Add" not "Added")
-   - Describes what the change does
-   - Follows the project's commit message patterns
-4. **Commit**: Add files and commit using the heredoc format:
+    - Is 50 characters or less
+    - Uses present tense ("Add" not "Added")
+    - Describes what the change does
+    - Follows the project's commit message patterns
+4. **Commit**: Add files and commit:
    ```bash
-   git add <files> && git commit -m "$(cat <<'EOF'
-   Your commit message here.
-
-   🤖 Generated with [Claude Code](https://claude.com/claude-code)
-
-   Co-Authored-By: Claude Sonnet 4.5 <noreply@anthropic.com>
-   EOF
-   )"
+   git add <files> && git commit -m "Your commit message here"
    ```
 5. **Verify**: Run `git status` to confirm the commit succeeded
 
@@ -42,6 +35,6 @@ Common patterns for this codebase:
 
 ## Important Notes
 
-- Always include the Claude Code footer in commits
+- Commit as current user
 - Keep the main message under 50 characters
 - Follow existing commit message patterns in the project
