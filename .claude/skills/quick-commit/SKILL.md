@@ -38,3 +38,4 @@ Common patterns for this codebase:
 - Commit as current user
 - Keep the main message under 50 characters
 - Follow existing commit message patterns in the project
+- Don't add any additional information as "written by claude code" or similar
