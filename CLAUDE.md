@@ -50,8 +50,9 @@ Thorough code review with multiple evaluation passes and alternative implementat
 
 ### `/project-bundle`
 Scaffolds a full-stack project bundle:
-- **Backend**: .NET 9.0 layered architecture (API, Contracts, Domain, Repository, Client, DbMigrations, Tests) using LSCore packages
+- **Backend**: .NET 10.0 layered architecture (API, Contracts, Domain, Repository, Client, DbMigrations, Tests) using LSCore packages
 - **Frontend**: Next.js 13+ with React 18, JavaScript (JSX), MUI, Redux, Zustand
+- Flags: `-be`/`--back-end` (backend only), `-fe`/`--front-end` (frontend only), omit for both
 
 ## Conventions
 

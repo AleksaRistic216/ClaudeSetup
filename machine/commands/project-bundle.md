@@ -5,13 +5,21 @@ description: Create a new full-stack project bundle with .NET backend and Next.j
 # Project Bundle Creation Skill
 
 This skill creates a complete full-stack project bundle consisting of:
-- **Backend (BE)**: .NET 9.0 layered architecture (API, Contracts, Domain, Repository, Client, DbMigrations, Tests)
+- **Backend (BE)**: .NET 10.0 layered architecture (API, Contracts, Domain, Repository, Client, DbMigrations, Tests)
 - **Frontend (FE)**: Next.js 13+ with React 18, JavaScript (JSX), MUI, Redux, Zustand
+
+## Arguments
+
+- `-be` or `--back-end`: Only create the backend (.NET) projects — skip frontend entirely
+- `-fe` or `--front-end`: Only create the frontend (Next.js) project — skip backend entirely
+- When neither flag is passed, create both backend and frontend (default)
 
 ## Instructions
 
+Parse `$ARGUMENTS` for the flags above before starting. If `-be`/`--back-end` is present, only follow Part 1 (Backend) and skip Part 2 (Frontend). If `-fe`/`--front-end` is present, only follow Part 2 (Frontend) and skip Part 1 (Backend). If neither is present, follow both parts.
+
 This guide creates a full-stack project bundle consisting of:
-- **Backend (BE)**: .NET 9.0 layered architecture with API, Contracts, Domain, Repository, Client, DbMigrations, and Tests projects
+- **Backend (BE)**: .NET 10.0 layered architecture with API, Contracts, Domain, Repository, Client, DbMigrations, and Tests projects
 - **Frontend (FE)**: Next.js 13+ with React 18, JavaScript (JSX), MUI, organized by widgets/features
 - **Common Libraries**: Shared contracts, domain, and repository used across multiple modules
 
@@ -46,7 +54,7 @@ src/{ProjectName}/
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -111,14 +119,14 @@ public class UserEntity : LSCoreEntity, ILSCoreAuthUserPassEntity<string>
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="LSCore.Repository" Version="9.1.2" />
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\{ProjectName}.Common.Contracts\{ProjectName}.Common.Contracts.csproj" />
@@ -216,7 +224,7 @@ public static class ServicesExtensions
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -247,16 +255,16 @@ public static class ServicesExtensions
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="9.0.0">
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\{ProjectName}.Common.Repository\{ProjectName}.Common.Repository.csproj" />
@@ -295,7 +303,7 @@ app.Run();
 ```xml
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>your-guid-here</UserSecretsId>
@@ -307,7 +315,7 @@ app.Run();
     <PackageReference Include="LSCore.Exceptions.DependencyInjection" Version="9.1.2" />
     <PackageReference Include="LSCore.Logging" Version="9.1.2" />
     <PackageReference Include="LSCore.DependencyInjection" Version="9.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.1" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\{ProjectName}.Public.Domain\{ProjectName}.Public.Domain.csproj" />
@@ -445,7 +453,7 @@ public class UsersController(IUserManager userManager) : ControllerBase
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -519,7 +527,7 @@ public class UsersCreateRequest
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -627,7 +635,7 @@ public class UsersCreateRequestValidator : LSCoreValidatorBase<UsersCreateReques
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -688,7 +696,7 @@ public class UserRepository(
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
@@ -715,18 +723,18 @@ public class UserRepository(
 ```xml
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
+    <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.0" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.0.2" />
     <PackageReference Include="Moq" Version="4.20.72" />
     <PackageReference Include="FluentAssertions" Version="8.8.0" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="10.0.0" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
   </ItemGroup>
   <ItemGroup>
@@ -1555,6 +1563,8 @@ npm run test:coverage
 ---
 
 ## Part 6: Checklist for New Project
+
+Only use the checklist(s) that apply based on the flags passed (`-be`/`--back-end` = backend only, `-fe`/`--front-end` = frontend only, no flag = both).
 
 ### Backend Checklist
 - [ ] Create solution file (.sln)
