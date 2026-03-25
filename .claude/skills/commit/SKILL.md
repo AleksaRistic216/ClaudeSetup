@@ -6,11 +6,11 @@ allowed-tools: Bash
 
 # Quick Commit Skill
 
-This skill helps create git commits with short, concise messages (up to 50 characters).
+This skill helps create git commits with short, concise messages.
 
 ## Instructions
 
-When the user asks to commit changes with a short message:
+When the user asks to commit changes:
 
 1. **Review Changes**: Run `git status` and `git diff` in parallel to see what changes exist
 2. **Review Commit History**: Run `git log -5 --oneline` to see recent commit message style
@@ -26,12 +26,6 @@ When the user asks to commit changes with a short message:
 5. **Verify**: Run `git status` to confirm the commit succeeded
 
 ## Examples
-
-Common patterns for this codebase:
-- "Nalog za prevoz - [feature]"
-- "Add [feature] to [component]"
-- "Fix [issue] in [module]"
-- "Update [entity] with [property]"
 
 ## Important Notes
 
