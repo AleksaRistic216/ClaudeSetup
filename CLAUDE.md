@@ -25,7 +25,7 @@ ClaudeSetup/
 │   ├── settings.local.json                # Local permission allowlist
 │   └── skills/
 │       └── setup/SKILL.md                 # Installs machine/ to ~/.claude/
-└── docs/                                  # (empty)
+└── docs/                                  # BE documentation (copied into new projects by /project-bundle)
 ```
 
 ## Usage

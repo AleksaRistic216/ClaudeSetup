@@ -1578,6 +1578,21 @@ npm run test:coverage
 
 ---
 
+## Part 5.5: Documentation
+
+Create a `docs/` directory in the repository root and populate it with backend documentation files. The documentation source lives in the ClaudeSetup repository at `~/source/ClaudeSetup/docs/`. Copy all `.md` files from there into the new project's `docs/` directory:
+
+```bash
+mkdir -p docs
+cp ~/source/ClaudeSetup/docs/*.md docs/
+```
+
+If `~/source/ClaudeSetup/docs/` is not available, skip this step silently.
+
+This step applies to both backend-only and full-stack bundles (skip only for frontend-only `-fe` builds).
+
+---
+
 ## Part 6: Checklist for New Project
 
 Only use the checklist(s) that apply based on the flags passed (`-be`/`--back-end` = backend only, `-fe`/`--front-end` = frontend only, no flag = both).
@@ -1597,6 +1612,7 @@ Only use the checklist(s) that apply based on the flags passed (`-be`/`--back-en
 - [ ] Add initial migration
 - [ ] Configure appsettings.json with Vault/environment settings
 - [ ] Projects added to solution
+- [ ] Create docs/ directory with backend documentation
 
 ### Frontend Checklist
 - [ ] Initialize Next.js project
