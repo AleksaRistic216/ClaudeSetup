@@ -7,22 +7,27 @@ description: Create a git commit with a short message (up to 50 characters). Use
 When the user asks to commit changes:
 
 1. **Review Changes**: Run `git status` and `git diff` in parallel to see what changes exist
-2. **Review Commit History**: Run `git log -5 --oneline` to see recent commit message style
-3. **Draft Message**: Create a concise commit message that:
+2. **Determine Scope**:
+   - **Default**: Include ALL uncommitted files — staged, unstaged, and untracked
+   - **`-soc` / `--scope-of-change`**: Only include files that were created or modified during the current conversation session. Ignore pre-existing uncommitted changes that were not part of this session's work.
+3. **Review Commit History**: Run `git log -5 --oneline` to see recent commit message style
+4. **Draft Message**: Create a concise commit message that:
     - Is 50 characters or less
     - Uses present tense ("Add" not "Added")
     - Describes what the change does
     - Follows the project's commit message patterns
-4. **Commit**: Add files and commit:
+5. **Commit**: Stage and commit:
    ```bash
-   git add <files> && git commit -m "Your commit message here"
+   git add -A && git commit -m "Your commit message here"
    ```
-5. **Push (if requested)**: If the user passed `-p` or `--push`, run `git push` after the commit succeeds
-6. **Verify**: Run `git status` to confirm the commit succeeded
+   If `-soc` / `--scope-of-change` was passed, only `git add` the specific files touched in this session instead of `-A`.
+6. **Push (if requested)**: If the user passed `-p` or `--push`, run `git push` after the commit succeeds
+7. **Verify**: Run `git status` to confirm the commit succeeded
 
 ## Arguments
 
 - `-p` or `--push`: Push to the remote after committing
+- `-soc` or `--scope-of-change`: Only commit files changed during the current session (ignore pre-existing uncommitted changes)
 
 ## Important Notes
 
