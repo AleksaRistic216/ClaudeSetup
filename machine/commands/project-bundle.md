@@ -1580,14 +1580,14 @@ npm run test:coverage
 
 ## Part 5.5: Documentation
 
-Create a `docs/` directory in the repository root and populate it with backend documentation files. The documentation source lives in the ClaudeSetup repository at `~/source/ClaudeSetup/docs/`. Copy all `.md` files from there into the new project's `docs/` directory:
+Create a `docs/` directory in the repository root and populate it with backend documentation files. The template docs live at `~/source/ClaudeSetup/docs/commands/project-bundle/docs/`. Copy all `.md` files into the new project's `docs/` directory:
 
 ```bash
 mkdir -p docs
-cp ~/source/ClaudeSetup/docs/*.md docs/
+cp ~/source/ClaudeSetup/docs/commands/project-bundle/docs/*.md docs/
 ```
 
-If `~/source/ClaudeSetup/docs/` is not available, skip this step silently.
+If the source directory is not available, skip this step silently.
 
 This step applies to both backend-only and full-stack bundles (skip only for frontend-only `-fe` builds).
 
