@@ -17,7 +17,12 @@ When the user asks to commit changes:
    ```bash
    git add <files> && git commit -m "Your commit message here"
    ```
-5. **Verify**: Run `git status` to confirm the commit succeeded
+5. **Push (if requested)**: If the user passed `-p` or `--push`, run `git push` after the commit succeeds
+6. **Verify**: Run `git status` to confirm the commit succeeded
+
+## Arguments
+
+- `-p` or `--push`: Push to the remote after committing
 
 ## Important Notes
 
