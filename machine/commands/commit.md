@@ -1,14 +1,8 @@
 ---
-name: quick-commit
 description: Create a git commit with a short message (up to 50 characters). Use when the user asks to commit changes with a short/concise message.
-allowed-tools: Bash
 ---
 
-# Quick Commit Skill
-
-This skill helps create git commits with short, concise messages.
-
-## Instructions
+# Quick Commit
 
 When the user asks to commit changes:
 
@@ -25,11 +19,11 @@ When the user asks to commit changes:
    ```
 5. **Verify**: Run `git status` to confirm the commit succeeded
 
-## Examples
-
 ## Important Notes
 
 - Commit as current user
 - Keep the main message under 50 characters
 - Follow existing commit message patterns in the project
 - Don't add any additional information as "written by claude code" or similar
+
+$ARGUMENTS

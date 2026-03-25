@@ -1,7 +1,5 @@
 ---
-name: project-bundle
 description: Create a new full-stack project bundle with .NET backend and Next.js frontend. Use when the user asks to create a new project, scaffold a new application, or set up FE/BE structure.
-allowed-tools: Bash, Write, Read, Glob, Edit
 ---
 
 # Project Bundle Creation Skill
@@ -1586,3 +1584,5 @@ npm run test:coverage
 - [ ] Configure constants (cookies, endpoints, permissions)
 - [ ] Set up theme
 - [ ] Configure Jest for testing
+
+$ARGUMENTS
