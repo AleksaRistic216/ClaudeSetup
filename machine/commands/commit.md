@@ -24,8 +24,22 @@ When the user asks to commit changes:
 6. **Push (if requested)**: If the user passed `-p` or `--push`, run `git push` after the commit succeeds
 7. **Verify**: Run `git status` to confirm the commit succeeded
 
+## Help
+
+If `$ARGUMENTS` contains `-h` or `--help`, do NOT run the command. Instead, print the following and stop:
+
+```
+/commit — Create a git commit with a concise message (≤50 chars)
+
+Options:
+  -p, --push              Push to remote after committing
+  -soc, --scope-of-change Only commit files changed during the current session
+  -h, --help              Show this help message
+```
+
 ## Arguments
 
+- `-h` or `--help`: Show help message and exit
 - `-p` or `--push`: Push to the remote after committing
 - `-soc` or `--scope-of-change`: Only commit files changed during the current session (ignore pre-existing uncommitted changes)
 

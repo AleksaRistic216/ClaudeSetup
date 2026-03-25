@@ -59,3 +59,4 @@ Scaffolds a full-stack project bundle:
 - `machine/` mirrors `~/.claude/` structure — add new global commands here
 - `.claude/skills/setup/` is the only project-level skill (only useful inside this repo)
 - No build/test/lint commands — this is a configuration-only repo
+- **Every command must support `-h` / `--help`**: Add a `## Help` section that checks `$ARGUMENTS` for the flag, prints a short description + options table, and stops without executing. See existing commands for the pattern.

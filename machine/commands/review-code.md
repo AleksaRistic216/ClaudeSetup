@@ -2,6 +2,21 @@
 description: Perform a thorough code review with multiple evaluation passes and alternative implementation research
 ---
 
+## Help
+
+If `$ARGUMENTS` contains `-h` or `--help`, do NOT run the command. Instead, print the following and stop:
+
+```
+/review-code — Thorough code review with multiple evaluation passes
+
+Options:
+  -h, --help  Show this help message
+
+Pass a file path or description to review specific code, or omit to review recent changes.
+```
+
+## Instructions
+
 Use the `code-review-analyst` agent to perform a comprehensive code review of the specified code or recent changes.
 
 The agent will:

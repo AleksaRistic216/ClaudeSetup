@@ -8,15 +8,31 @@ This skill creates a complete full-stack project bundle consisting of:
 - **Backend (BE)**: .NET 10.0 layered architecture (API, Contracts, Domain, Repository, Client, DbMigrations, Tests)
 - **Frontend (FE)**: Next.js 13+ with React 18, JavaScript (JSX), MUI, Redux, Zustand
 
+## Help
+
+If `$ARGUMENTS` contains `-h` or `--help`, do NOT run the command. Instead, print the following and stop:
+
+```
+/project-bundle — Scaffold a full-stack project bundle (.NET backend + Next.js frontend)
+
+Options:
+  -be, --back-end   Only create the backend (.NET) projects
+  -fe, --front-end  Only create the frontend (Next.js) project
+  -h, --help        Show this help message
+
+When neither -be nor -fe is passed, both backend and frontend are created.
+```
+
 ## Arguments
 
+- `-h` or `--help`: Show help message and exit
 - `-be` or `--back-end`: Only create the backend (.NET) projects — skip frontend entirely
 - `-fe` or `--front-end`: Only create the frontend (Next.js) project — skip backend entirely
 - When neither flag is passed, create both backend and frontend (default)
 
 ## Instructions
 
-Parse `$ARGUMENTS` for the flags above before starting. If `-be`/`--back-end` is present, only follow Part 1 (Backend) and skip Part 2 (Frontend). If `-fe`/`--front-end` is present, only follow Part 2 (Frontend) and skip Part 1 (Backend). If neither is present, follow both parts.
+Parse `$ARGUMENTS` for the flags above before starting. If `-h`/`--help` is present, show the help text above and stop. If `-be`/`--back-end` is present, only follow Part 1 (Backend) and skip Part 2 (Frontend). If `-fe`/`--front-end` is present, only follow Part 2 (Frontend) and skip Part 1 (Backend). If neither is present, follow both parts.
 
 This guide creates a full-stack project bundle consisting of:
 - **Backend (BE)**: .NET 10.0 layered architecture with API, Contracts, Domain, Repository, Client, DbMigrations, and Tests projects
