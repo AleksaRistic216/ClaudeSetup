@@ -34,7 +34,10 @@ Prints the new state after toggling.
 
 4. **Toggle**:
    - If currently **enabled**: remove `CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` from `settings.env`. If `settings.env` becomes empty after removal, remove the `env` key entirely. Also remove the top-level `teammateMode` key if present.
-   - If currently **disabled**: set `settings.env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` to `"1"` and set the top-level `teammateMode` to `"tmux"`.
+   - If currently **disabled**: set `settings.env.CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS` to `"1"` and set the top-level `teammateMode` based on the OS:
+     - **Linux or macOS**: set `teammateMode` to `"tmux"`
+     - **Windows**: set `teammateMode` to `"in-process"`
+     - Detect the OS by running `uname -s` (returns `Linux`, `Darwin`, etc. on Unix) or checking `$OS` env var (equals `Windows_NT` on Windows). If the platform cannot be determined, default to `"in-process"`.
 
 5. **Write back**: Save the updated JSON to `~/.claude/settings.json`, preserving all other existing settings. Use 2-space indentation.
 

@@ -48,7 +48,7 @@ Run `/setup` from this repo to install all global commands and instructions to `
 ## Global Commands
 
 ### `/battle-royale`
-Toggles the experimental Claude Code agent teams feature (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`) in `~/.claude/settings.json`. Enables with `teammateMode: tmux`; disables by removing the setting.
+Toggles the experimental Claude Code agent teams feature (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`) in `~/.claude/settings.json`. Enables with `teammateMode: tmux` on Linux/macOS or `teammateMode: in-process` on Windows; disables by removing the setting.
 
 ### `/team {task}`
 Executes a task in agent team mode. You act as team lead; Claude spawns teammate agents to work in parallel on independent sub-tasks, then synthesizes results.
