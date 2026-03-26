@@ -15,7 +15,9 @@ ClaudeSetup/
 ├── machine/                               # Files installed to ~/.claude/ via /setup
 │   ├── CLAUDE.md                          # Global instructions (all projects)
 │   ├── commands/                          # Global slash commands (all projects)
+│   │   ├── battle-royale.md
 │   │   ├── commit.md
+│   │   ├── team.md
 │   │   ├── review-code.md
 │   │   └── project-bundle.md
 │   └── agents/                            # Custom agents (all projects)
@@ -44,6 +46,13 @@ Run `/setup` from this repo to install all global commands and instructions to `
 | `machine/CLAUDE.md`        | `~/.claude/CLAUDE.md`  | Global instructions (all projects)   |
 
 ## Global Commands
+
+### `/battle-royale`
+Toggles the experimental Claude Code agent teams feature (`CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS`) in `~/.claude/settings.json`. Enables with `teammateMode: tmux`; disables by removing the setting.
+
+### `/team {task}`
+Executes a task in agent team mode. You act as team lead; Claude spawns teammate agents to work in parallel on independent sub-tasks, then synthesizes results.
+- `-l N` / `--limit N`: cap teammates at N
 
 ### `/commit`
 Creates git commits with concise messages (≤50 chars, present tense, no Claude attribution).
