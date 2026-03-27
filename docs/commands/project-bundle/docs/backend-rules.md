@@ -2,6 +2,10 @@
 
 Critical rules that must always be followed in every .NET backend project.
 
+## LSCore Documentation
+
+Official LSCore documentation is available at https://core.wiki.limitlesssoft.com. Consult it whenever you need details about LSCore APIs, base classes, configuration, or features not covered in these project docs.
+
 ## Always Update Interfaces
 
 When modifying a manager implementation, always update the corresponding interface first (or simultaneously).

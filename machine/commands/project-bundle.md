@@ -34,6 +34,8 @@ When neither -be nor -fe is passed, both backend and frontend are created.
 
 Parse `$ARGUMENTS` for the flags above before starting. If `-h`/`--help` is present, show the help text above and stop. If `-be`/`--back-end` is present, only follow Part 1 (Backend) and skip Part 2 (Frontend). If `-fe`/`--front-end` is present, only follow Part 2 (Frontend) and skip Part 1 (Backend). If neither is present, follow both parts.
 
+**LSCore Documentation**: Official LSCore docs are at https://core.wiki.limitlesssoft.com — consult them whenever you need details about LSCore APIs, base classes, configuration, or features.
+
 This guide creates a full-stack project bundle consisting of:
 - **Backend (BE)**: .NET 9.0 layered architecture with API, Contracts, Domain, Repository, Client, DbMigrations, and Tests projects
 - **Frontend (FE)**: Next.js 13+ with React 18, JavaScript (JSX), MUI, organized by widgets/features
