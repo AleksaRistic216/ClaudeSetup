@@ -72,6 +72,8 @@ Location: `Domain/Validators/`
 
 Inherit from `LSCoreValidatorBase<T>` (FluentValidation).
 
+**Important**: Inject `IWebDbContextFactory` (not `WebDbContext`) in validators. Validators are registered as singletons, so injecting a scoped `DbContext` directly would capture a single instance for the application's lifetime, leading to stale data and memory leaks. Use `dbContextFactory.Create<WebDbContext>()` to get a fresh context per validation call.
+
 ```csharp
 public class ProductsSaveRequestValidator : LSCoreValidatorBase<ProductsSaveRequest>
 {
