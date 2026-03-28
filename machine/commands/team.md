@@ -41,6 +41,7 @@ From `$ARGUMENTS`:
 Before spawning anyone, think through the task and decide:
 
 - **How many teammates** are genuinely needed to parallelize this work? Each teammate should have a clearly distinct, independent sub-task. Don't spawn teammates just to have them — only spawn as many as are actually useful.
+- **Think granularly.** Don't default to one "frontend agent" and one "backend agent". If the frontend has multiple independent components (e.g., a data table, a form, a chart), each can have its own agent. If the backend has separate concerns (e.g., a repository layer, an API controller, a background job), split those too. The more parallel the work, the faster the result — so lean toward more agents, not fewer, as long as each has a clear and non-overlapping responsibility.
 - If a **limit** was passed, cap the teammate count at that number. If the natural split would exceed the limit, consolidate sub-tasks so no teammate is wasted.
 - Name each teammate's responsibility in one line.
 
