@@ -15,3 +15,7 @@ These instructions apply to all projects on this machine.
 ## C# Conventions
 
 - One type per file — do not define multiple classes, records, interfaces, enums, or structs in a single file
+
+## Entity Framework Core
+
+- Always use the `dotnet ef` CLI tool to create and update migrations — never write or edit migration files manually
