@@ -10,7 +10,7 @@ These instructions apply to all projects on this machine.
 
 - Use present tense ("Add" not "Added")
 - Keep commit messages under 50 characters
-- Don't add "written by claude code" or similar attribution
+- NEVER add "Co-Authored-By", "written by claude code", or any AI/Claude attribution to commits or PRs
 
 ## C# Conventions
 

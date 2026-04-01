@@ -48,6 +48,6 @@ Options:
 - Commit as current user
 - Keep the main message under 50 characters
 - Follow existing commit message patterns in the project
-- Don't add any additional information as "written by claude code" or similar
+- NEVER add "Co-Authored-By", "written by claude code", or any AI/Claude attribution to commits or PRs
 
 $ARGUMENTS
