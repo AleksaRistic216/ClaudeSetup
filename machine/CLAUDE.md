@@ -19,3 +19,7 @@ These instructions apply to all projects on this machine.
 ## Entity Framework Core
 
 - Always use the `dotnet ef` CLI tool to create and update migrations — never write or edit migration files manually
+
+## Stopping Processes
+
+- When asked to stop or kill specific apps (e.g. backend, frontend), only stop those processes — do not kill browsers or other applications that may be using them
