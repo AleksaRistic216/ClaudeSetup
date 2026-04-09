@@ -123,7 +123,7 @@ src/{ProjectName}/
 
 **Sample Entity (`UserEntity.cs`):**
 ```csharp
-using LSCore.Contracts;
+using LSCore.Repository.Contracts;
 using LSCore.Auth.UserPass.Contracts;
 
 namespace {ProjectName}.Common.Contracts.Entities;
@@ -140,6 +140,8 @@ public class UserEntity : LSCoreEntity, ILSCoreAuthUserPassEntity<string>
 }
 ```
 
+**Note:** All entities must use `using LSCore.Repository.Contracts;` (not `LSCore.Contracts;`) — that is where `LSCoreEntity` lives. Also, do NOT redeclare `CreatedAt` on entities — it is already inherited from `LSCoreEntity`.
+
 ### 1.3 Common.Repository Project
 
 **File: `{ProjectName}.Common.Repository.csproj`**
@@ -153,7 +155,7 @@ public class UserEntity : LSCoreEntity, ILSCoreAuthUserPassEntity<string>
   <ItemGroup>
     <PackageReference Include="LSCore.Repository" Version="9.1.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.3" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\{ProjectName}.Common.Contracts\{ProjectName}.Common.Contracts.csproj" />
@@ -196,7 +198,7 @@ public class {ProjectName}DbContext(
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         var connectionString = DbConstants.ConnectionString(configurationRoot);
-        optionsBuilder.UseNpgsql(connectionString);
+        optionsBuilder.UseNpgsql(connectionString, b => b.MigrationsAssembly("{ProjectName}.Common.DbMigrations"));
         base.OnConfiguring(optionsBuilder);
     }
 }
@@ -256,8 +258,7 @@ public static class ServicesExtensions
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Microsoft.Extensions.Configuration" />
-    <PackageReference Include="LSCore.Validation" Version="9.1.2" />
+    <PackageReference Include="LSCore.Validation.Domain" Version="9.1.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\{ProjectName}.Common.Contracts\{ProjectName}.Common.Contracts.csproj" />
@@ -337,12 +338,11 @@ app.Run();
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="LSCore.Auth.Key.DependencyInjection" Version="9.1.4.1" />
     <PackageReference Include="LSCore.Auth.UserPass.DependencyInjection" Version="9.1.2" />
+    <PackageReference Include="LSCore.Auth.UserPass.Domain" Version="9.1.3" />
     <PackageReference Include="LSCore.Exceptions.DependencyInjection" Version="9.1.2" />
     <PackageReference Include="LSCore.Logging" Version="9.1.2" />
-    <PackageReference Include="LSCore.DependencyInjection" Version="9.1.2" />
-    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="9.0.1" />
+    <PackageReference Include="LSCore.DependencyInjection" Version="9.1.3" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\{ProjectName}.Public.Domain\{ProjectName}.Public.Domain.csproj" />
@@ -366,30 +366,23 @@ app.Run();
 
 **Sample Program.cs:**
 ```csharp
-using LSCore.Auth.Key.DependencyInjection;
+using LSCore.Auth.UserPass.Contracts;
 using LSCore.Auth.UserPass.DependencyInjection;
+using LSCore.Auth.UserPass.Domain;
 using LSCore.DependencyInjection;
 using LSCore.Exceptions.DependencyInjection;
 using LSCore.Logging;
 using {ProjectName}.Common.Repository;
+using {ProjectName}.Public.Repository.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add configuration
-builder.AddCommon();
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
 
-// Add Redis caching (optional)
-builder.Services.AddStackExchangeRedisCache(options =>
-{
-    options.InstanceName = "{project-name}-" + Environment.GetEnvironmentVariable("DEPLOY_ENV") + "-";
-    options.ConfigurationOptions = new StackExchange.Redis.ConfigurationOptions
-    {
-        EndPoints = { { "your-redis-host", 6379 } },
-        SyncTimeout = 30 * 1000
-    };
-});
+builder.Services.AddSingleton<IConfigurationRoot>(builder.Configuration);
 
-// Add CORS
 builder.Services.AddCors(options =>
 {
     options.AddDefaultPolicy(policy =>
@@ -398,26 +391,22 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Add Auth
-builder.AddLSCoreAuthUserPass(new LSCoreAuthUserPassConfiguration
+// Auth — generic params: <TEntityIdentifier, TAuthManager, TRepository>
+builder.AddLSCoreAuthUserPass<string, LSCoreAuthUserPassManager<string>, UserRepository>(new LSCoreAuthUserPassConfiguration
 {
     AccessTokenExpirationMinutes = 720,
-    RefreshTokenExpirationMinutes = 43200,
-    Audience = "{project-name}-termodom",
-    Issuer = "{project-name}-termodom",
+    RefreshTokenExpirationDays = 30,   // NOTE: Days, not Minutes
+    Audience = "{project-name}",
+    Issuer = "{project-name}",
     SecurityKey = Environment.GetEnvironmentVariable("JWT_KEY") ?? "your-dev-key"
 });
 
-// Register database
 builder.Services.RegisterDatabase();
 
-// Add LSCore DI (auto-registers managers, repositories, validators)
 builder.AddLSCoreDependencyInjection("{ProjectName}");
 
-// Add logging
 builder.AddLSCoreLogging();
 
-// Add controllers
 builder.Services.AddControllers();
 
 var app = builder.Build();
@@ -425,7 +414,9 @@ var app = builder.Build();
 app.UseCors();
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseLSCoreExceptions();
+app.UseLSCoreExceptionsHandler();
+app.UseLSCoreDependencyInjection();
+app.UseLSCoreAuthUserPass<string>();
 app.MapControllers();
 
 app.Run();
@@ -433,7 +424,7 @@ app.Run();
 
 **Sample Controller (`UsersController.cs`):**
 ```csharp
-using LSCore.Contracts;
+using LSCore.Common.Contracts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using {ProjectName}.Public.Contracts.Interfaces.IManagers;
@@ -447,7 +438,7 @@ namespace {ProjectName}.Public.Api.Controllers;
 public class UsersController(IUserManager userManager) : ControllerBase
 {
     [HttpGet]
-    public IActionResult GetAll([FromQuery] LSCorePaginatedRequest request)
+    public IActionResult GetAll([FromQuery] UsersGetAllRequest request)
     {
         return Ok(userManager.GetAll(request));
     }
@@ -501,9 +492,10 @@ public class UsersController(IUserManager userManager) : ControllerBase
 │   └── Users/
 │       └── UserDto.cs
 ├── DtosMappings/
-│   └── UserDtoMapping.cs
+│   └── UserDtoMapper.cs        # Implements ILSCoreMapper<TSource, TDest>
 ├── Enums/
 │   ├── SortColumnCodes/
+│   │   └── UsersSortColumn.cs  # Enum with Id, Username, Nickname etc.
 │   └── ValidationCodes/
 ├── Helpers/
 ├── Interfaces/
@@ -515,12 +507,54 @@ public class UsersController(IUserManager userManager) : ControllerBase
 │   └── Factories/
 └── Requests/
     └── Users/
-        └── UsersCreateRequest.cs
+        ├── UsersCreateRequest.cs
+        └── UsersGetAllRequest.cs   # Extends LSCoreSortableAndPageableRequest<UsersSortColumn>
 ```
+
+**Sort column enum (`UsersSortColumn.cs`):**
+```csharp
+namespace {ProjectName}.Public.Contracts.Enums.SortColumnCodes;
+
+public enum UsersSortColumn { Id, Username, Nickname }
+```
+
+**GetAll request (`UsersGetAllRequest.cs`):**
+```csharp
+using LSCore.SortAndPage.Contracts;
+using {ProjectName}.Public.Contracts.Enums.SortColumnCodes;
+
+namespace {ProjectName}.Public.Contracts.Requests.Users;
+
+public class UsersGetAllRequest : LSCoreSortableAndPageableRequest<UsersSortColumn> { }
+```
+
+**Note:** `LSCoreSortableAndPageableRequest<T>` has `CurrentPage` (not `Page`) and `PageSize` properties.
+
+**DTO Mapper (`UserDtoMapper.cs`):**
+```csharp
+using LSCore.Mapper.Contracts;
+using {ProjectName}.Common.Contracts.Entities;
+using {ProjectName}.Public.Contracts.Dtos.Users;
+
+namespace {ProjectName}.Public.Contracts.DtosMappings;
+
+public class UserDtoMapper : ILSCoreMapper<UserEntity, UserDto>
+{
+    public UserDto ToMapped(UserEntity source) => new()
+    {
+        Id = source.Id,
+        Username = source.Username,
+        Nickname = source.Nickname
+    };
+}
+```
+
+**Note:** The mapper interface is `ILSCoreMapper<TSource, TDestination>` from `LSCore.Mapper.Contracts`. There is no `ILSCoreMapping<,>`.
 
 **Sample Interface (`IUserManager.cs`):**
 ```csharp
-using LSCore.Contracts;
+using LSCore.Common.Contracts;
+using LSCore.SortAndPage.Contracts;
 using {ProjectName}.Public.Contracts.Dtos.Users;
 using {ProjectName}.Public.Contracts.Requests.Users;
 
@@ -528,7 +562,7 @@ namespace {ProjectName}.Public.Contracts.Interfaces.IManagers;
 
 public interface IUserManager
 {
-    LSCorePaginatedResponse<UserDto> GetAll(LSCorePaginatedRequest request);
+    LSCoreSortedAndPagedResponse<UserDto> GetAll(UsersGetAllRequest request);
     UserDto GetSingle(LSCoreIdRequest request);
     void CreateOrUpdate(UsersCreateRequest request);
     void Delete(LSCoreIdRequest request);
@@ -586,10 +620,14 @@ public class UsersCreateRequest
 
 **Sample Manager (`UserManager.cs`):**
 ```csharp
-using LSCore.Contracts;
-using LSCore.Mapper;
+using LSCore.Common.Contracts;
+using LSCore.Mapper.Domain;
+using LSCore.SortAndPage.Contracts;
+using LSCore.SortAndPage.Domain;
+using Omu.ValueInjecter;
 using {ProjectName}.Common.Contracts.Entities;
 using {ProjectName}.Public.Contracts.Dtos.Users;
+using {ProjectName}.Public.Contracts.Enums.SortColumnCodes;
 using {ProjectName}.Public.Contracts.Interfaces.IManagers;
 using {ProjectName}.Public.Contracts.Interfaces.IRepositories;
 using {ProjectName}.Public.Contracts.Requests.Users;
@@ -598,9 +636,21 @@ namespace {ProjectName}.Public.Domain.Managers;
 
 public class UserManager(IUserRepository userRepository) : IUserManager
 {
-    public LSCorePaginatedResponse<UserDto> GetAll(LSCorePaginatedRequest request)
+    private static readonly Dictionary<UsersSortColumn, LSCoreSortRule<UserEntity>> SortRules = new()
     {
-        return userRepository.GetPaginated<UserDto>(request);
+        { UsersSortColumn.Id, new LSCoreSortRule<UserEntity>(x => x.Id) },
+        { UsersSortColumn.Username, new LSCoreSortRule<UserEntity>(x => x.Username) },
+        { UsersSortColumn.Nickname, new LSCoreSortRule<UserEntity>(x => x.Nickname) }
+    };
+
+    public LSCoreSortedAndPagedResponse<UserDto> GetAll(UsersGetAllRequest request)
+    {
+        return userRepository.GetMultiple()
+            .ToSortedAndPagedResponse<UserEntity, UsersSortColumn, UserDto>(
+                request,
+                SortRules,
+                x => x.ToMapped<UserEntity, UserDto>()
+            );
     }
 
     public UserDto GetSingle(LSCoreIdRequest request)
@@ -612,35 +662,44 @@ public class UserManager(IUserRepository userRepository) : IUserManager
     {
         if (request.Id == null)
         {
-            userRepository.Add(request.ToMapped<UsersCreateRequest, UserEntity>());
+            userRepository.Insert(request.ToMapped<UsersCreateRequest, UserEntity>());
         }
         else
         {
             var entity = userRepository.Get(request.Id.Value);
-            entity.UpdateMapped(request);
+            entity.InjectFrom(request);   // ValueInjecter: copies matching properties
             userRepository.Update(entity);
         }
     }
 
     public void Delete(LSCoreIdRequest request)
     {
-        userRepository.Delete(request.Id);
+        userRepository.SoftDelete(request.Id);
     }
 }
 ```
 
+**Key LSCore repository method names:**
+- `Insert(entity)` — NOT `Add()`
+- `Update(entity)` — correct
+- `SoftDelete(id)` — NOT `Delete()`
+- `HardDelete(id)` — physical delete
+- `Get(long id)` — accepts only `long`, NOT lambdas
+- `GetOrDefault(long id)` — nullable version
+- `GetMultiple()` — returns `IQueryable<TEntity>`
+- No `GetPaginated<>()` — use `GetMultiple().ToSortedAndPagedResponse<>()`
+
 **Sample Validator (`UsersCreateRequestValidator.cs`):**
 ```csharp
 using FluentValidation;
-using LSCore.Validation;
-using {ProjectName}.Common.Repository;
+using LSCore.Validation.Domain;
 using {ProjectName}.Public.Contracts.Requests.Users;
 
 namespace {ProjectName}.Public.Domain.Validators.Users;
 
 public class UsersCreateRequestValidator : LSCoreValidatorBase<UsersCreateRequest>
 {
-    public UsersCreateRequestValidator({ProjectName}DbContext dbContext)
+    public UsersCreateRequestValidator()
     {
         RuleFor(x => x.Username)
             .NotEmpty().WithMessage("Username is required")
@@ -655,6 +714,8 @@ public class UsersCreateRequestValidator : LSCoreValidatorBase<UsersCreateReques
     }
 }
 ```
+
+**Note:** `LSCoreValidatorBase<T>` is in `LSCore.Validation.Domain` namespace (not `LSCore.Validation`). Do NOT inject `DbContext` into the validator constructor unless you have a specific reason — keep it simple.
 
 ### 1.9 Public.Repository Project
 
@@ -700,7 +761,7 @@ public class UserRepository(
 {
     public UserEntity GetCurrentUser()
     {
-        return Get(x => x.Username == contextEntity.Identifier);
+        return dbContext.Users.First(x => x.Username == contextEntity.Identifier);
     }
 
     public ILSCoreAuthUserPassEntity<string>? GetOrDefault(string identifier)
@@ -710,7 +771,7 @@ public class UserRepository(
 
     public void SetRefreshToken(string entityIdentifier, string refreshToken)
     {
-        var user = Get(x => x.Username == entityIdentifier);
+        var user = dbContext.Users.First(x => x.Username == entityIdentifier);
         user.RefreshToken = refreshToken;
         Update(user);
     }
@@ -744,6 +805,21 @@ public class UserRepository(
     └── UsersEndpoints.cs
 ```
 
+**Sample Client (`{ProjectName}Client.cs`):**
+```csharp
+using LSCore.ApiClient.Rest;
+
+namespace {ProjectName}.Public.Client;
+
+public class {ProjectName}Client : LSCoreApiClient
+{
+    public {ProjectName}Client(LSCoreApiClientRestConfiguration<{ProjectName}Client> config)
+        : base(config) { }
+}
+```
+
+**Note:** The base class is `LSCoreApiClient` (not `LSCoreRestClient`) and takes `LSCoreApiClientRestConfiguration<TClient>`.
+
 ### 1.11 Public.Tests Project
 
 **File: `{ProjectName}.Public.Tests.csproj`**
@@ -765,11 +841,47 @@ public class UserRepository(
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\{ProjectName}.Public\{ProjectName}.Public.Api\{ProjectName}.Public.Api.csproj" />
-    <ProjectReference Include="..\{ProjectName}.Public\{ProjectName}.Public.Domain\{ProjectName}.Public.Domain.csproj" />
+    <ProjectReference Include="..\{ProjectName}.Public.Domain\{ProjectName}.Public.Domain.csproj" />
   </ItemGroup>
 </Project>
 ```
+
+**Sample Test (`Managers/UserManagerTests.cs`):**
+```csharp
+using FluentAssertions;
+using Moq;
+using Xunit;
+using {ProjectName}.Common.Contracts.Entities;
+using {ProjectName}.Public.Contracts.Interfaces.IRepositories;
+using {ProjectName}.Public.Contracts.Requests.Users;
+using {ProjectName}.Public.Domain.Managers;
+
+namespace {ProjectName}.Public.Tests.Managers;
+
+public class UserManagerTests
+{
+    private readonly Mock<IUserRepository> _userRepositoryMock = new();
+    private readonly UserManager _sut;
+
+    public UserManagerTests()
+    {
+        _sut = new UserManager(_userRepositoryMock.Object);
+    }
+
+    [Fact]
+    public void GetAll_ReturnsPagedResponse()
+    {
+        var request = new UsersGetAllRequest { CurrentPage = 1, PageSize = 10 };
+        _userRepositoryMock.Setup(r => r.GetMultiple()).Returns(Array.Empty<UserEntity>().AsQueryable());
+
+        var result = _sut.GetAll(request);
+
+        result.Should().NotBeNull();
+    }
+}
+```
+
+**Note:** `LSCoreSortableAndPageableRequest` uses `CurrentPage` (not `Page`). Always use `using Xunit;` — xunit attributes are not global.
 
 ---
 
@@ -1563,7 +1675,7 @@ dotnet build src/{ProjectName}/{ProjectName}.Public/{ProjectName}.Public.Api/{Pr
 dotnet run --project src/{ProjectName}/{ProjectName}.Public/{ProjectName}.Public.Api/{ProjectName}.Public.Api.csproj
 
 # Add migration
-dotnet ef migrations add MigrationName --project src/{ProjectName}/{ProjectName}.Common/{ProjectName}.Common.DbMigrations
+dotnet ef migrations add MigrationName --project src/{ProjectName}/{ProjectName}.Common/{ProjectName}.Common.DbMigrations --startup-project src/{ProjectName}/{ProjectName}.Common/{ProjectName}.Common.DbMigrations
 
 # Run tests
 dotnet test src/{ProjectName}/{ProjectName}.Public.Tests/{ProjectName}.Public.Tests.csproj
