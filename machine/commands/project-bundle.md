@@ -34,6 +34,15 @@ When neither -be nor -fe is passed, both backend and frontend are created.
 
 Parse `$ARGUMENTS` for the flags above before starting. If `-h`/`--help` is present, show the help text above and stop. If `-be`/`--back-end` is present, only follow Part 1 (Backend) and skip Part 2 (Frontend). If `-fe`/`--front-end` is present, only follow Part 2 (Frontend) and skip Part 1 (Backend). If neither is present, follow both parts.
 
+**Use agent team mode**: When creating both backend and frontend (no `-be`/`-fe` flag), split the work across parallel agents using the Agent tool:
+- **Backend agent**: responsible for all of Part 1 (Backend) and Part 5.5 (Documentation)
+- **Frontend agent**: responsible for all of Part 2 (Frontend)
+- **You (team lead)**: handle Parts 3–5 (solution file, git init, appsettings) and final synthesis
+
+Announce the team plan before spawning agents. Each agent must receive enough context to work autonomously: the project name, relevant parts of this guide (copy the exact instructions for their section), and the LSCore docs URL. After both agents complete, synthesize their results and present the full checklist status.
+
+When only `-be` or `-fe` is passed, work solo (no agents needed).
+
 **LSCore Documentation**: Official LSCore docs are at https://core.wiki.limitlesssoft.com — consult them whenever you need details about LSCore APIs, base classes, configuration, or features.
 
 This guide creates a full-stack project bundle consisting of:
