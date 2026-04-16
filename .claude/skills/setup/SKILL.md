@@ -23,6 +23,57 @@ Everything under the `machine/` directory in this repo is copied to `~/.claude/`
 
 Follow these steps in order:
 
+### Step 0: Check prerequisites (whisper.cpp)
+
+Detect the OS and check whether whisper.cpp is present. Use `uname -s` on Linux/macOS; on Windows the shell is typically Git Bash or WSL.
+
+```bash
+uname -s 2>/dev/null || echo "Windows"
+```
+
+Then check for the whisper-cli binary:
+
+```bash
+# Check PATH first, then the default build location
+command -v whisper-cli 2>/dev/null \
+  || command -v whisper-cli.exe 2>/dev/null \
+  || test -f "$HOME/whisper.cpp/build/bin/whisper-cli" && echo "found" \
+  || test -f "$HOME/whisper.cpp/build/bin/Release/whisper-cli.exe" && echo "found" \
+  || echo "not found"
+```
+
+**If whisper-cli is found:** print "`whisper.cpp — OK`" and continue.
+
+**If not found:** print a warning and installation instructions for the detected OS, then ask the user whether to continue setup anyway or stop to install whisper.cpp first.
+
+Linux instructions to show:
+```
+whisper.cpp not found. To install on Linux:
+
+  git clone https://github.com/ggml-org/whisper.cpp ~/whisper.cpp
+  cd ~/whisper.cpp
+  cmake -B build
+  cmake --build build --config Release
+  bash models/download-ggml-model.sh base.en
+
+After building, whisper-cli will be at ~/whisper.cpp/build/bin/whisper-cli
+```
+
+Windows instructions to show:
+```
+whisper.cpp not found. To install on Windows:
+
+  git clone https://github.com/ggml-org/whisper.cpp %USERPROFILE%\whisper.cpp
+  cd %USERPROFILE%\whisper.cpp
+  cmake -B build
+  cmake --build build --config Release
+  bash models/download-ggml-model.sh base.en
+
+After building, whisper-cli will be at %USERPROFILE%\whisper.cpp\build\bin\Release\whisper-cli.exe
+```
+
+Wait for user confirmation before proceeding if whisper.cpp is missing.
+
 ### Step 1: Determine the repo root
 
 The repo root is the directory containing this skill's parent `.claude/` directory. All paths below are relative to the repo root.
