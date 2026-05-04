@@ -42,9 +42,34 @@ command -v whisper-cli 2>/dev/null \
   || echo "not found"
 ```
 
-**If whisper-cli is found:** print "`whisper.cpp — OK`" and continue.
+**If whisper-cli is found:** print "`whisper.cpp — OK`" and continue to model checks.
 
 **If not found:** print a warning and installation instructions for the detected OS, then ask the user whether to continue setup anyway or stop to install whisper.cpp first.
+
+#### Model checks (run only if whisper-cli was found)
+
+Check for both STT models:
+
+```bash
+test -f "$HOME/whisper.cpp/models/ggml-small.en.bin" && echo "english model found" || echo "english model missing"
+test -f "$HOME/whisper.cpp/models/ggml-large-v3.bin" && echo "serbian model found" || echo "serbian model missing"
+```
+
+Print a status line for each:
+- Found: `ggml-small.en.bin — OK` / `ggml-large-v3.bin — OK`
+- Missing: `ggml-small.en.bin — MISSING` / `ggml-large-v3.bin — MISSING`
+
+For any missing model, print the download command:
+
+```
+To download the English model:
+  cd ~/whisper.cpp && bash models/download-ggml-model.sh small.en
+
+To download the Serbian (multilingual) model:
+  cd ~/whisper.cpp && bash models/download-ggml-model.sh large-v3
+```
+
+Missing models are a warning only — do not block setup or ask for confirmation.
 
 Linux instructions to show:
 ```

@@ -53,6 +53,12 @@ ClaudeSetup/
 └── CLAUDE.md                  # Project-level instructions
 ```
 
+## Docs
+
+| Doc | Description |
+|---|---|
+| [`docs/stt.md`](docs/stt.md) | Speech-to-text setup (Whisper CPP, English + Serbian hotkeys) |
+
 ## Adding New Commands or Agents
 
 1. Add the `.md` file under `machine/commands/` or `machine/agents/`
