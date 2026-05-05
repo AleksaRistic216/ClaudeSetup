@@ -17,8 +17,8 @@ Press the hotkey to start recording. Press it again to stop — Whisper transcri
 
 | Script | Model | Notes |
 |---|---|---|
-| `stt.sh` | `ggml-small.en.bin` | English-only, faster |
-| `stt-sr.sh` | `ggml-large-v3.bin` | Best quality, multilingual |
+| `stt.sh` | `ggml-medium.en.bin` | English-only, GPU-accelerated (~685ms) |
+| `stt-sr.sh` | `ggml-large-v3-sr-q5_0.bin` | Serbian fine-tuned, GPU-accelerated (~1.1s) |
 
 ### Downloading Models
 
@@ -26,11 +26,30 @@ Press the hotkey to start recording. Press it again to stop — Whisper transcri
 cd ~/whisper.cpp
 
 # English
-bash models/download-ggml-model.sh small.en
+bash models/download-ggml-model.sh medium.en
 
-# Serbian (large-v3 — best quality)
-bash models/download-ggml-model.sh large-v3
+# Serbian — fine-tuned large-v3 (Sagicc/Whisper.cpp on HuggingFace, 1.08 GB)
+wget -O models/ggml-large-v3-sr-q5_0.bin \
+  "https://huggingface.co/Sagicc/Whisper.cpp/resolve/main/ggml-large-v3-sr-q5_0.bin"
 ```
+
+### Serbian model notes
+
+The Serbian model (`Sagicc/whisper-large-v3-sr-q5_0`) is a community fine-tune of `whisper-large-v3` trained on Common Voice 13, Google FLEURS, and custom Serbian audio (5.56% WER). It outputs Cyrillic by default — `stt-sr.sh` pipes the result through a deterministic Cyrillic→Latin transliteration so the typed output is always latinica.
+
+## GPU Acceleration (CUDA)
+
+Both scripts benefit from GPU acceleration. whisper.cpp must be built with CUDA support:
+
+```bash
+cd ~/whisper.cpp
+cmake -B build -DGGML_CUDA=ON
+cmake --build build --config Release -j$(nproc)
+```
+
+Requires `nvidia-cuda-toolkit` (`sudo apt install nvidia-cuda-toolkit`). The build auto-detects the GPU architecture — no manual flags needed. Tested with RTX 3060 Ti + CUDA 12.4.
+
+**Speedup:** encode drops from ~12s (CPU) to ~180ms (GPU) for the Serbian large-v3 model.
 
 ## Hotkey Setup (GNOME)
 
