@@ -12,12 +12,15 @@ This skill installs the Claude Code configuration from this repository to the lo
 
 Everything under the `machine/` directory in this repo is copied to `~/.claude/`, mirroring the directory structure:
 
-| Source (repo)              | Destination              | Purpose                              |
-|----------------------------|--------------------------|--------------------------------------|
-| `machine/commands/*.md`    | `~/.claude/commands/`    | Global slash commands (all projects) |
-| `machine/agents/*.md`      | `~/.claude/agents/`      | Custom agents (all projects)         |
-| `machine/CLAUDE.md`        | `~/.claude/CLAUDE.md`    | Global instructions (all projects)   |
-| `machine/hooks/*.sh`       | `~/.claude/hooks/`       | PreToolUse/PostToolUse hook scripts  |
+| Source (repo)                   | Destination                         | Purpose                              |
+|---------------------------------|-------------------------------------|--------------------------------------|
+| `machine/commands/*.md`         | `~/.claude/commands/`               | Global slash commands |
+| `machine/agents/*.md`           | `~/.claude/agents/`                 | Custom agents |
+| `machine/CLAUDE.md`             | `~/.claude/CLAUDE.md`               | Global instructions |
+| `machine/conemu/setup-conemu.ps1` | *(runs in-place)* | ConEmu terminal setup (Windows only) |
+| `machine/hooks/*.sh`            | `~/.claude/hooks/`                  | PreToolUse/PostToolUse hook scripts  |
+| `machine/whisper-hotkey.ahk`    | `~/.claude/whisper-hotkey.ahk`      | Voice input hotkey (Windows only)    |
+| `machine/get-default-mic.ps1`   | `~/.claude/get-default-mic.ps1`     | Helper: detect default capture mic   |
 
 ## Instructions
 
@@ -202,7 +205,113 @@ EOF
 
 Repeat this pattern for any additional hook scripts found in `machine/hooks/`, adjusting the matcher and command path accordingly.
 
-### Step 7: Verify installation
+### Step 7 (Windows only): Voice input hotkey
+
+If the OS detected in Step 0 is Windows AND the files
+`machine/whisper-hotkey.ahk` + `machine/get-default-mic.ps1` exist, offer to
+install the voice input hotkey. Skip on non-Windows.
+
+Ask the user: "Install/refresh the whisper.cpp voice input hotkey (Ctrl+Alt+R)?
+Requires ffmpeg + AutoHotkey v2. [y/N]". Proceed only on 'y'.
+
+#### 7a. Verify dependencies
+
+```bash
+command -v "/c/Program Files/AutoHotkey/v2/AutoHotkey64.exe" 2>/dev/null || echo "ahk-missing"
+test -f "$LOCALAPPDATA/Microsoft/WinGet/Links/ffmpeg.exe" && echo "ffmpeg-ok" || echo "ffmpeg-missing"
+```
+
+If either is missing, print the matching install command and ask the user to
+run it, then re-run `/setup`:
+
+```
+winget install AutoHotkey.AutoHotkey
+winget install Gyan.FFmpeg
+```
+
+(whisper.cpp itself was already checked in Step 0.)
+
+#### 7b. Copy the scripts
+
+```bash
+cp machine/whisper-hotkey.ahk ~/.claude/whisper-hotkey.ahk
+cp machine/get-default-mic.ps1 ~/.claude/get-default-mic.ps1
+```
+
+#### 7c. Detect the default capture mic and substitute it into the AHK script
+
+The AHK template ships with `MicName := "REPLACE_WITH_YOUR_MIC_NAME"`. Run
+the PowerShell helper to discover the current Windows default, then `sed` it
+in:
+
+```bash
+MIC=$(powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$USERPROFILE/.claude/get-default-mic.ps1" 2>/dev/null | tr -d '\r' | tail -n1)
+echo "Detected default mic: $MIC"
+```
+
+If `$MIC` is empty, tell the user to:
+1. Set their preferred mic as default in Windows Sound Settings (Input tab)
+2. Re-run `/setup`
+
+Otherwise, substitute the placeholder:
+
+```bash
+# Escape sed metacharacters in the mic name (might contain parens, spaces, etc.)
+MIC_ESCAPED=$(printf '%s' "$MIC" | sed 's/[\/&]/\\&/g')
+sed -i "s/REPLACE_WITH_YOUR_MIC_NAME/$MIC_ESCAPED/" ~/.claude/whisper-hotkey.ahk
+```
+
+Verify the line:
+```bash
+grep "^MicName" ~/.claude/whisper-hotkey.ahk
+```
+
+#### 7d. Create the Startup shortcut so AHK auto-launches on login
+
+```bash
+powershell.exe -NoProfile -Command '
+$ws = New-Object -ComObject WScript.Shell
+$sc = $ws.CreateShortcut("$($ws.SpecialFolders(\"Startup\"))\whisper-hotkey.lnk")
+$sc.TargetPath = "C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe"
+$sc.Arguments  = "`"$env:USERPROFILE\.claude\whisper-hotkey.ahk`""
+$sc.Save()
+'
+```
+
+#### 7e. Kill any old AHK instance and launch the new one
+
+```bash
+taskkill //IM AutoHotkey64.exe //F 2>/dev/null
+powershell.exe -NoProfile -Command 'Start-Process -FilePath "C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe" -ArgumentList ($env:USERPROFILE + "\.claude\whisper-hotkey.ahk")'
+```
+
+Tell the user: "Ctrl+Alt+R to start recording, press again to stop. If you
+change mics, edit `MicName :=` in `~/.claude/whisper-hotkey.ahk` and re-run
+`/setup` (or restart AHK). See `docs/voice-input.md` for the full rationale."
+
+### Step 8 (Windows only): ConEmu terminal setup
+
+If the OS is Windows, configure ConEmu as the terminal emulator with custom shortcuts and display settings.
+
+```bash
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$REPO_ROOT/machine/conemu/setup-conemu.ps1"
+```
+
+This script will:
+1. Install ConEmu via winget if not already present
+2. Locate ConEmu.xml and patch it with custom settings:
+   - Font: JetBrains Mono
+   - Zoom: Ctrl+Shift+= (in), Ctrl+- (out)
+   - Split: Ctrl+T (horizontal), Ctrl+Alt+T (vertical)
+   - Close panel: Ctrl+W
+   - Resize panels: Alt+J/K/L/; (left/up/right/down)
+   - Navigate panels: Ctrl+Alt+PgUp/PgDn/Home/End (up/down/left/right)
+   - Inactive panel fade for visual focus indication
+
+If ConEmu is not installed and winget is unavailable, print a warning and continue.
+See `docs/conemu.md` for full shortcut reference.
+
+### Step 9: Verify installation
 
 List the installed files and confirm success:
 
@@ -213,12 +322,13 @@ ls -la ~/.claude/hooks/
 cat ~/.claude/CLAUDE.md
 ```
 
-### Step 8: Report
+### Step 10: Report
 
 Tell the user:
 - What was installed
 - Which commands are now available globally (e.g., `/commit`, `/review-code`, `/project-bundle`)
 - Which hooks are now active
+- On Windows: whether the voice input hotkey (Ctrl+Alt+R) was set up
 - Remind them to re-run `/setup` from this repo after pulling updates
 
 ## Important Notes

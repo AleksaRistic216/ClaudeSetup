@@ -1,1 +1,5 @@
 .idea
+
+# Repo-level override: global gitignore ignores docs/ but this repo uses it.
+!docs/
+!docs/**

@@ -18,6 +18,7 @@ This copies everything under `machine/` to `~/.claude/`, making commands and age
 | `machine/commands/*.md` | `~/.claude/commands/` | Global slash commands |
 | `machine/agents/*.md` | `~/.claude/agents/` | Custom agents |
 | `machine/CLAUDE.md` | `~/.claude/CLAUDE.md` | Global instructions |
+| `machine/conemu/*` | *(runs in-place)* | ConEmu terminal setup (Windows) |
 
 ## Commands
 
@@ -44,9 +45,14 @@ ClaudeSetup/
 │   │   ├── commit.md
 │   │   ├── review-code.md
 │   │   └── project-bundle.md
-│   └── agents/                # Custom agents
-│       ├── code-review-analyst.md
-│       └── code-change-reviewer.md
+│   ├── agents/                # Custom agents
+│   │   ├── code-review-analyst.md
+│   │   └── code-change-reviewer.md
+│   └── conemu/                # ConEmu terminal setup (Windows)
+│       └── setup-conemu.ps1
+├── docs/
+│   ├── conemu.md              # ConEmu shortcut reference
+│   └── voice-input.md
 ├── .claude/
 │   └── skills/
 │       └── setup/SKILL.md     # /setup skill (only useful inside this repo)
