@@ -2,6 +2,11 @@
 
 These instructions apply to all projects on this machine.
 
+## Persistent Memory
+
+The ClaudeSetup repo at `~/source/ClaudeSetup/memory/` holds persistent cross-machine context (URLs, project details, preferences).
+When working in that repo, read `memory/INDEX.md` at session start and load relevant files. Save new context there and commit so it syncs via git.
+
 ## Before Starting Work
 
 - Always check if there are docs within the repo (e.g., `docs/`, `README.md`, wiki files) and read relevant ones before starting work on a task.

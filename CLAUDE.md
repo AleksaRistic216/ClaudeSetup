@@ -2,6 +2,12 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Persistent Memory
+
+This repo contains a `memory/` directory with context that should survive across machines and sessions.
+**At the start of every conversation in this repo, read `memory/INDEX.md` and load any files relevant to the current task.**
+When you learn new context (URLs, credentials, preferences, project details), save them to the appropriate memory file and commit.
+
 ## Overview
 
 This repository contains **Claude Code configuration and custom skills**. It is not a software application — it houses reusable Claude Code skills, settings, and project scaffolding templates.
