@@ -67,7 +67,7 @@ SendCtrlC(pid) {
             FileDelete FfmpegErrLog
         ; cmd.exe wrapper gives us stderr redirection; the outer quotes are
         ; stripped by cmd's /c quoting rules so the inner quoting survives.
-        cmd := 'cmd.exe /c ""' FfmpegPath '" -hide_banner -f dshow -i "audio=' MicName '"'
+        cmd := 'cmd.exe /c ""' FfmpegPath '" -hide_banner -f dshow -audio_buffer_size 50 -i "audio=' MicName '"'
              . ' -ar 16000 -ac 1 -f s16le -y "' PcmFile '" 2> "' FfmpegErrLog '""'
         Log("cmd: " cmd)
         try {
@@ -79,6 +79,7 @@ SendCtrlC(pid) {
             Flash("✗ Run failed: " e.Message)
             return
         }
+        Sleep 100
         startTick := A_TickCount
         recording := true
         ToolTip "● REC — Ctrl+Alt+R to stop"
@@ -150,7 +151,12 @@ SendCtrlC(pid) {
         Flash("⚠ No speech detected")
         return
     }
+    ; Always copy to clipboard as fallback — SendText silently fails when the
+    ; target window is elevated and this script is not (Windows UIPI).
+    A_Clipboard := text
+    Log("clipboard set, calling SendText")
     SendText text
+    Flash("✓ " SubStr(text, 1, 40) (StrLen(text) > 40 ? "…" : "") " 📋")
 }
 
 ; We record raw PCM so force-termination can't corrupt a WAV header. This

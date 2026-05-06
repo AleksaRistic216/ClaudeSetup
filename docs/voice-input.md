@@ -94,24 +94,38 @@ Sample output: `Microphone (Trust USB microphone )`. Copy this verbatim —
 including trailing spaces and weird punctuation — into the `MicName :=` line at
 the top of `~/.claude/whisper-hotkey.ahk`.
 
-### Auto-launch on login
+### Auto-launch on login (elevated)
 
-Create a shortcut to the AHK script in `shell:startup`:
+Use a scheduled task so the hotkey runs elevated — this lets `SendText` reach
+admin terminals and other elevated windows (Windows UIPI blocks non-elevated
+senders). A startup shortcut can't request elevation without a UAC prompt on
+every login; a scheduled task with `RunLevel Highest` can.
+
 ```powershell
-$ws = New-Object -ComObject WScript.Shell
-$sc = $ws.CreateShortcut("$($ws.SpecialFolders('Startup'))\whisper-hotkey.lnk")
-$sc.TargetPath = "C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe"
-$sc.Arguments  = "`"$env:USERPROFILE\.claude\whisper-hotkey.ahk`""
-$sc.Save()
+$action   = New-ScheduledTaskAction -Execute "C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe" `
+              -Argument "`"$env:USERPROFILE\.claude\whisper-hotkey.ahk`""
+$trigger  = New-ScheduledTaskTrigger -AtLogOn -User $env:USERNAME
+$principal = New-ScheduledTaskPrincipal -UserId $env:USERNAME -RunLevel Highest
+$settings = New-ScheduledTaskSettingsSet -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries `
+              -ExecutionTimeLimit ([TimeSpan]::Zero)
+Register-ScheduledTask -TaskName "WhisperHotkey" -Action $action -Trigger $trigger `
+  -Principal $principal -Settings $settings -Force
 ```
+
+> If you previously used a startup shortcut, remove it:
+> `Remove-Item "$env:APPDATA\Microsoft\Windows\Start Menu\Programs\Startup\whisper-hotkey.lnk" -ErrorAction SilentlyContinue`
 
 ### Launch now
 ```powershell
-Start-Process "C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe" "$env:USERPROFILE\.claude\whisper-hotkey.ahk"
+Start-Process "C:\Program Files\AutoHotkey\v2\AutoHotkey64.exe" "$env:USERPROFILE\.claude\whisper-hotkey.ahk" -Verb RunAs
 ```
 
 Press **Ctrl+Alt+R**, speak, press **Ctrl+Alt+R** again. The transcription is
 typed at the cursor.
+
+> **Clipboard fallback:** The script always copies the transcription to the
+> clipboard before calling `SendText`. If typing doesn't work (e.g., a stubborn
+> app that blocks synthetic input), just **Ctrl+V** to paste.
 
 ## How it works
 
@@ -132,6 +146,14 @@ Diagnostic logs:
 ## Gotchas encountered along the way
 
 Design notes so the next iteration doesn't walk the same minefield.
+
+### `SendText` silently fails against elevated windows (UIPI)
+Windows **User Interface Privilege Isolation** blocks a non-elevated process
+from sending synthetic input to an elevated one. If the AHK script runs at
+normal privilege and the target window (e.g., an admin terminal) is elevated,
+`SendText` does nothing — no error, no text. The fix: run the AHK script
+elevated (scheduled task with `RunLevel Highest`) and always copy the
+transcription to the clipboard as a fallback.
 
 ### Hotkey clashes with Xbox Game Bar
 **Win+Alt+R** is Xbox Game Bar's screen-recording shortcut. Pressing it opens
