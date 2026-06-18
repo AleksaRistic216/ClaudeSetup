@@ -2,4 +2,6 @@
 
 How the user likes things done — saved so Claude doesn't ask twice.
 
-<!-- entries added below as they are learned -->
+## Git workflow
+
+- Never commit and push without explicit user permission. Always wait for the user to say "commit" or "push" before doing so.
