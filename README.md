@@ -1,6 +1,6 @@
 # ClaudeSetup
 
-Reusable [Claude Code](https://claude.ai/code) configuration — global commands, custom agents, and project scaffolding templates. Not a software application; this repo exists to keep Claude Code setup portable and version-controlled.
+Reusable [Claude Code](https://claude.ai/code) and [GitHub Copilot CLI](https://docs.github.com/copilot/concepts/agents/about-copilot-cli) configuration — global commands, custom agents, and project scaffolding templates. Not a software application; this repo exists to keep AI coding assistant setup portable and version-controlled.
 
 ## Quick Start
 
@@ -9,15 +9,15 @@ cd ClaudeSetup
 /setup
 ```
 
-This copies everything under `machine/` to `~/.claude/`, making commands and agents available in all projects. Re-run after pulling updates.
+This copies everything under `machine/` to `~/.claude/` and mirrors commands/agents to `~/.copilot/`, making them available in all projects for both Claude Code and GitHub Copilot CLI. Re-run after pulling updates.
 
 ## What Gets Installed
 
 | Source | Destination | Purpose |
 |---|---|---|
-| `machine/commands/*.md` | `~/.claude/commands/` | Global slash commands |
-| `machine/agents/*.md` | `~/.claude/agents/` | Custom agents |
-| `machine/CLAUDE.md` | `~/.claude/CLAUDE.md` | Global instructions |
+| `machine/commands/*.md` | `~/.claude/commands/` + `~/.copilot/commands/` | Global slash commands |
+| `machine/agents/*.md` | `~/.claude/agents/` + `~/.copilot/agents/` | Custom agents |
+| `machine/CLAUDE.md` | `~/.claude/CLAUDE.md` + `~/.copilot/copilot-instructions.md` | Global instructions |
 | `machine/conemu/*` | *(runs in-place)* | ConEmu terminal setup (Windows) |
 
 ## Commands
@@ -68,4 +68,4 @@ ClaudeSetup/
 ## Adding New Commands or Agents
 
 1. Add the `.md` file under `machine/commands/` or `machine/agents/`
-2. Run `/setup` to install it to `~/.claude/`
+2. Run `/setup` to install it to `~/.claude/` and `~/.copilot/`

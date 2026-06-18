@@ -1,6 +1,6 @@
 ---
 name: setup
-description: Install Claude Code configuration from this repository to the local machine (~/.claude/). Sets up global commands, CLAUDE.md, and settings at the user level so they are available in all projects.
+description: Install configuration from this repository to the local machine (~/.claude/ and ~/.copilot/). Sets up global commands, agents, CLAUDE.md, and settings at the user level so they are available in all projects across both Claude Code and GitHub Copilot CLI.
 allowed-tools: Bash, Read, Write, Glob, Edit
 ---
 
@@ -311,7 +311,21 @@ This script will:
 If ConEmu is not installed and winget is unavailable, print a warning and continue.
 See `docs/conemu.md` for full shortcut reference.
 
-### Step 9: Verify installation
+### Step 9: Mirror to GitHub Copilot CLI (~/.copilot/)
+
+GitHub Copilot CLI uses `~/.copilot/` for its configuration. Mirror commands, agents, and global instructions so they work in both tools.
+
+```bash
+mkdir -p ~/.copilot/commands
+mkdir -p ~/.copilot/agents
+cp ~/.claude/commands/*.md ~/.copilot/commands/
+cp ~/.claude/agents/*.md ~/.copilot/agents/
+cp ~/.claude/CLAUDE.md ~/.copilot/copilot-instructions.md
+```
+
+Print: "Mirrored to ~/.copilot/ (commands, agents, copilot-instructions.md)"
+
+### Step 10: Verify installation
 
 List the installed files and confirm success:
 
@@ -320,14 +334,19 @@ ls -la ~/.claude/commands/
 ls -la ~/.claude/agents/
 ls -la ~/.claude/hooks/
 cat ~/.claude/CLAUDE.md
+echo "--- Copilot CLI ---"
+ls -la ~/.copilot/commands/
+ls -la ~/.copilot/agents/
+ls -la ~/.copilot/copilot-instructions.md
 ```
 
-### Step 10: Report
+### Step 11: Report
 
 Tell the user:
 - What was installed
 - Which commands are now available globally (e.g., `/commit`, `/review-code`, `/project-bundle`)
 - Which hooks are now active
+- That commands and agents are mirrored to `~/.copilot/` for GitHub Copilot CLI
 - On Windows: whether the voice input hotkey (Ctrl+Alt+R) was set up
 - Remind them to re-run `/setup` from this repo after pulling updates
 

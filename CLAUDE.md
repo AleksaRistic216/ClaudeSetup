@@ -10,7 +10,7 @@ When you learn new context (URLs, credentials, preferences, project details), sa
 
 ## Overview
 
-This repository contains **Claude Code configuration and custom skills**. It is not a software application — it houses reusable Claude Code skills, settings, and project scaffolding templates.
+This repository contains **Claude Code and GitHub Copilot CLI configuration**. It is not a software application — it houses reusable skills, settings, and project scaffolding templates that work across both AI coding assistants.
 
 ## Repository Structure
 
@@ -46,16 +46,16 @@ ClaudeSetup/
 
 ## Usage
 
-Run `/setup` from this repo to install all global commands and instructions to `~/.claude/`. Re-run after pulling updates.
+Run `/setup` from this repo to install all global commands and instructions to `~/.claude/` and `~/.copilot/`. Re-run after pulling updates.
 
 ## What gets installed
 
 | Source                         | Destination                        | Purpose                              |
 |--------------------------------|------------------------------------|--------------------------------------|
-| `machine/commands/*.md`        | `~/.claude/commands/`              | Global slash commands (all projects) |
-| `machine/agents/*.md`          | `~/.claude/agents/`                | Custom agents (all projects)         |
+| `machine/commands/*.md`        | `~/.claude/commands/` + `~/.copilot/commands/` | Global slash commands (all projects) |
+| `machine/agents/*.md`          | `~/.claude/agents/` + `~/.copilot/agents/`     | Custom agents (all projects)         |
 | `machine/hooks/*.sh`           | `~/.claude/hooks/`                 | PreToolUse/PostToolUse hook scripts  |
-| `machine/CLAUDE.md`            | `~/.claude/CLAUDE.md`              | Global instructions (all projects)   |
+| `machine/CLAUDE.md`            | `~/.claude/CLAUDE.md` + `~/.copilot/copilot-instructions.md` | Global instructions (all projects)   |
 | `machine/whisper-hotkey.ahk`   | `~/.claude/whisper-hotkey.ahk`     | Voice input hotkey (Windows)         |
 | `machine/get-default-mic.ps1`  | `~/.claude/get-default-mic.ps1`    | Helper: detect default capture mic   |
 
