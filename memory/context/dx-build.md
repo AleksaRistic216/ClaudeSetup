@@ -41,3 +41,34 @@ dotnet build "path\to\Solution.NetCore.Desktop.sln" --no-restore -v q
 | DevExpress.Utils | `Win/DevExpress.Utils/DevExpress.Utils/DevExpress.Utils.sln` | `Win/DevExpress.Utils/DevExpress.Utils/DevExpress.Utils.NetCore.Desktop.sln` |
 | DevExpress.XtraBars | `Win/DevExpress.XtraBars/DevExpress.XtraBars/DevExpress.XtraBars.sln` | `Win/DevExpress.XtraBars/DevExpress.XtraBars/DevExpress.XtraBars.NetCore.Desktop.sln` |
 | XtraBars Tests | `Win/DevExpress.XtraBars/DevExpress.XtraBars.Tests/DevExpress.XtraBars.Tests.sln` | `Win/DevExpress.XtraBars/DevExpress.XtraBars.Tests/DevExpress.XtraBars.Tests.NetCore.Desktop.sln` |
+
+## How to Run Tests
+
+Tests must be run using the NetCore.Desktop project (it has `Microsoft.NET.Test.Sdk`). The FW project does not.
+
+### Step 1 — Build dependencies first (if sources changed)
+
+```powershell
+& "C:\Program Files\Microsoft Visual Studio\18\Professional\MSBuild\Current\Bin\MSBuild.exe" "Win/DevExpress.Utils/DevExpress.Utils/DevExpress.Utils.NetCore.Desktop.sln" /t:Build /p:Configuration=Debug /v:q /nologo
+```
+
+### Step 2 — Build the test project
+
+```powershell
+& "C:\Program Files\Microsoft Visual Studio\18\Professional\MSBuild\Current\Bin\MSBuild.exe" "Win/DevExpress.XtraBars/DevExpress.XtraBars.Tests/DevExpress.XtraBars.Tests.NetCore.Desktop.csproj" /t:Build /p:Configuration=Debug /v:q /nologo
+```
+
+### Step 3 — Run tests via vstest
+
+```powershell
+# All tests
+dotnet vstest "Bin/NETCore/DevExpress.XtraBars.Tests.dll" --logger:"console;verbosity=normal"
+
+# Filtered (e.g. by class or method name)
+dotnet vstest "Bin/NETCore/DevExpress.XtraBars.Tests.dll" --TestCaseFilter:"FullyQualifiedName~DockManagerTests" --logger:"console;verbosity=normal"
+```
+
+### Notes
+- `dotnet test` silently succeeds on the FW `.csproj` without running anything (no Test SDK).
+- `dotnet test` on the NetCore `.csproj` fails with MSB4803 (COM reference needs full MSBuild).
+- Always rebuild the dependency DLLs in `Bin/NETCore/` if the source assembly changed.
