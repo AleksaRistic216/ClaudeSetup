@@ -36,7 +36,8 @@ ClaudeSetup/
 ├── .claude/
 │   ├── settings.local.json                # Local permission allowlist
 │   └── skills/
-│       └── setup/SKILL.md                 # Installs machine/ to ~/.claude/
+│       ├── setup/SKILL.md                 # Installs machine/ to ~/.claude/
+│       └── uninstall/SKILL.md             # Removes what /setup installed
 └── docs/
     ├── voice-input.md                     # Windows whisper hotkey setup guide
     └── commands/
@@ -47,6 +48,11 @@ ClaudeSetup/
 ## Usage
 
 Run `/setup` from this repo to install all global commands and instructions to `~/.claude/` and `~/.copilot/`. Re-run after pulling updates.
+
+Run `/uninstall` from this repo to remove them again. It builds its inventory from `machine/`, so it
+only deletes files this repo owns; it backs up first, keeps locally modified files unless `--force`
+is passed, and unregisters this repo's hooks without touching other `settings.json` keys.
+Flags: `--dry-run`, `--claude`, `--copilot`, `--force`, `--no-backup`.
 
 ## What gets installed
 
@@ -96,6 +102,8 @@ Linux/macOS.
 ## Conventions
 
 - `machine/` mirrors `~/.claude/` structure — add new global commands here
-- `.claude/skills/setup/` is the only project-level skill (only useful inside this repo)
+- `.claude/skills/` holds the project-level skills (`setup`, `uninstall`) — only useful inside this repo
+- When you add something to `machine/`, check `uninstall` removes it: its inventory walks `machine/`,
+  but per-category loops and the Windows/ConEmu steps are hand-written
 - No build/test/lint commands — this is a configuration-only repo
 - **Every command must support `-h` / `--help`**: Add a `## Help` section that checks `$ARGUMENTS` for the flag, prints a short description + options table, and stops without executing. See existing commands for the pattern.

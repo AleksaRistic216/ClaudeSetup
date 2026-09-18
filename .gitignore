@@ -3,3 +3,9 @@
 # Repo-level override: global gitignore ignores docs/ but this repo uses it.
 !docs/
 !docs/**
+
+# Repo-level override: global gitignore ignores .claude/ but this repo's
+# project skills live there. Everything else under .claude/ stays ignored.
+!.claude/
+.claude/*
+!.claude/skills/
