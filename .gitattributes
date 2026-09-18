@@ -1,0 +1,2 @@
+# Shell scripts run under Git Bash — a CRLF shebang breaks them.
+*.sh text eol=lf

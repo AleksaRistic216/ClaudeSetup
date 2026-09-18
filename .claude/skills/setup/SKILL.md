@@ -16,6 +16,7 @@ Everything under the `machine/` directory in this repo is copied to `~/.claude/`
 |---------------------------------|-------------------------------------|--------------------------------------|
 | `machine/commands/*.md`         | `~/.claude/commands/`               | Global slash commands |
 | `machine/agents/*.md`           | `~/.claude/agents/`                 | Custom agents |
+| `machine/skills/*/`             | `~/.claude/skills/`                 | Skills (directories, Claude Code only) |
 | `machine/CLAUDE.md`             | `~/.claude/CLAUDE.md`               | Global instructions |
 | `machine/conemu/setup-conemu.ps1` | *(runs in-place)* | ConEmu terminal setup (Windows only) |
 | `machine/hooks/*.sh`            | `~/.claude/hooks/`                  | PreToolUse/PostToolUse hook scripts  |
@@ -125,6 +126,9 @@ Agents (→ ~/.claude/agents/):
   - code-review-analyst.md (OVERRIDE — already exists)
   - code-change-reviewer.md (NEW)
 
+Skills (→ ~/.claude/skills/):
+  - review-panel/ (NEW)
+
 Global instructions:
   - CLAUDE.md (OVERRIDE — already exists)
 
@@ -149,6 +153,22 @@ cp machine/commands/*.md ~/.claude/commands/
 mkdir -p ~/.claude/agents
 cp machine/agents/*.md ~/.claude/agents/
 ```
+
+### Step 4b: Install skills
+
+Only if `machine/skills/` exists. Skills are **directories**, not single files — each holds a
+`SKILL.md` and may carry `scripts/` or `references/` beside it, so copy the whole tree.
+
+```bash
+mkdir -p ~/.claude/skills
+cp -r machine/skills/. ~/.claude/skills/
+chmod +x ~/.claude/skills/*/scripts/*.sh 2>/dev/null || true
+```
+
+Skills are a Claude Code concept — do **not** mirror them to `~/.copilot/` in Step 9.
+
+Note that a skill directory removed from this repo is not removed from `~/.claude/skills/` by a
+copy. If a skill was renamed, delete the old directory by hand and say so in the report.
 
 ### Step 5: Install global CLAUDE.md
 
@@ -332,6 +352,7 @@ List the installed files and confirm success:
 ```bash
 ls -la ~/.claude/commands/
 ls -la ~/.claude/agents/
+ls -d ~/.claude/skills/*/
 ls -la ~/.claude/hooks/
 cat ~/.claude/CLAUDE.md
 echo "--- Copilot CLI ---"
